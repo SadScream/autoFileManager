@@ -14,43 +14,21 @@ class Event(FileSystemEventHandler):
 			exists = False
 
 			if any(_ in filename.split('.')[-1] for _ in extensionList["images"]):
-				i = 0
-
-				if filename not in os.listdir(destinations[i]):
-					new = os.path.join(destinations[i], str(filename))
-				else:
-					exists = True
-					new = processingFile(filename, destinations[i])
-
+				position = 0
 			elif any(_ in filename.split('.')[-1] for _ in extensionList["documents"]):
-				i = 1
-
-				if filename not in os.listdir(destinations[i]):
-					new = os.path.join(destinations[i], filename)
-				else:
-					exists = True
-					new = processingFile(filename, destinations[i])
-
+				position = 1
 			elif any(_ in filename.split('.')[-1] for _ in extensionList["audios"]):
-				i = 2
-
-				if filename not in os.listdir(destinations[i]):
-					new = os.path.join(destinations[i], filename)
-				else:
-					exists = True
-					new = processingFile(filename, destinations[i])
-
+				position = 2
 			elif any(_ in filename.split('.')[-1] for _ in extensionList["videos"]):
-				i = 3
-
-				if filename not in os.listdir(destinations[i]):
-					new = os.path.join(destinations[i], filename)
-				else:
-					exists = True
-					new = processingFile(filename, destinations[i])
-
+				position = 3
 			else:
 				continue
+
+			if filename not in os.listdir(destinations[position]): # есть ли уже в папке файл с таким названием
+				new = os.path.join(destinations[position], filename)
+			else:
+				exists = True
+				new = processingFile(filename, destinations[position])
 
 			if new != default:
 				if not exists:
@@ -61,18 +39,30 @@ class Event(FileSystemEventHandler):
 
 
 def processingFile(filename, destination):
-	filesList = [_ for _ in os.listdir(destination) if filename == _]
+	'''
+	формирование файла с новым названием, т.к файл с первоначальным названием уже существует
+	'''
+
+	filesList = [_ for _ in os.listdir(destination) if filename in _]
 
 	pickedFileName = '.'.join(filename.split('.')[:-1])
-	fileDigit = str(len(filesList))
+	fileDigit = len(filesList)
 	fileExtension = filename.split('.')[-1]
 
 	fileName = f"{pickedFileName}_{fileDigit}.{fileExtension}"
+
+	while fileName in os.listdir(destination):
+		fileDigit += 1
+		fileName = f"{pickedFileName}_{fileDigit}.{fileExtension}"
 
 	return os.path.join(destination, fileName)
 
 
 def detectingFolders():
+	'''
+	проверка наличия папок на диске
+	'''
+	
 	for folder in folders:
 		if not os.path.exists(os.path.join(disk, folder)):
 			print(f"{os.path.join(disk, folder)} doesn't exist, creating..")
@@ -85,7 +75,7 @@ folders = ["_Pictures", "_Documents", "_Audios", "_Videos"] # order must to matc
 
 extensionList = {
 	"images": ['jpg', 'bmp', 'png', 'jpeg', 'gif'],
-	"documents": ['docx', 'doc', 'pptx', 'pdf'],
+	"documents": ['docx', 'doc', 'pptx', 'pdf', 'xls'],
 	"audios": ['ogg', 'mp3'],
 	"videos": ['mp4']
 }
