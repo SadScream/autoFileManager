@@ -1,8 +1,8 @@
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from datetime import datetime
+from time import sleep
 import os
-import time
 
 
 class Event(FileSystemEventHandler):
@@ -62,7 +62,7 @@ def detectingFolders():
 	'''
 	проверка наличия папок на диске
 	'''
-	
+
 	for folder in folders:
 		if not os.path.exists(os.path.join(disk, folder)):
 			print(f"{os.path.join(disk, folder)} doesn't exist, creating..")
@@ -71,7 +71,7 @@ def detectingFolders():
 
 trackingFolder = "D:\\Downloaded"
 disk = "D:\\"
-folders = ["_Pictures", "_Documents", "_Audios", "_Videos"] # order must to match with extensionList keys
+folders = ["_Pictures", "_Documents", "_Audios", "_Videos"] # has to match with extensionList keys order
 
 extensionList = {
 	"images": ['jpg', 'bmp', 'png', 'jpeg', 'gif'],
@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
 	try:
 		while True:
-			time.sleep(10)
+			sleep(10)
 	except KeyboardInterrupt:
 		observer.stop()
 
