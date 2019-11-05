@@ -3,7 +3,7 @@ from watchdog.events import FileSystemEventHandler
 from datetime import datetime
 from time import sleep
 import os
-import psutil
+import sys
 
 
 class Event(FileSystemEventHandler):
@@ -19,20 +19,6 @@ class Event(FileSystemEventHandler):
 			default = os.path.join(trackingFolder, filename)
 			new = default
 			exists = False
-
-			# for proc in psutil.process_iter():
-			# 	try:
-			# 		filesList = proc.open_files()
-			# 		if filesList:
-			# 			for nt in filesList:
-			# 				if "_Pic" in nt.path:
-			# 					print(proc.pid,proc.name())
-			# 					print("\t",nt.path)
-			# 	except psutil.NoSuchProcess:
-			# 		pass
-			# 	except psutil.AccessDenied:
-			# 		pass
-			# return
 
 			if any(_ in filename.split('.')[-1] for _ in extensionList["images"]):
 				position = 0
@@ -89,9 +75,14 @@ def detectingFolders():
 			print(f"{os.path.join(disk, folder)} doesn't exist, creating..")
 			os.makedirs(os.path.join(disk, folder))
 
+args = sys.argv[1:]
 
-trackingFolder = "D:\\Downloaded"
-disk = "D:\\"
+if len(args):
+	trackingFolder = args[0]
+	disk = args[1]
+else:
+	trackingFolder = "D:\\Downloaded"
+	disk = "D:\\Python"
 folders = ["_Pictures", "_Documents", "_Audios", "_Videos"] # has to match with extensionList keys order
 
 extensionList = {
@@ -101,11 +92,8 @@ extensionList = {
 	"videos": ['mp4']
 }
 
-
+destinations = [os.path.join(disk, folder) for folder in folders]
 detectingFolders()
-
-
-destinations = [os.path.join(disk, _) for _ in folders]
 
 if __name__ == '__main__':
 	event = Event()
