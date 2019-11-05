@@ -8,29 +8,31 @@ import psutil
 
 class Event(FileSystemEventHandler):
 
-	# def on_created(self, event):
-	# 	print(f"\nFILE CREATED\t...wait for 5 seconds...")
-	# 	sleep(5)
-	# 	self.on_moved(event)
+	def on_created(self, event):
+		print(f"\nFILE CREATED\t")
+		sleep(1)
+		self.on_moved(event)
 
-	def on_modified(self, event):
+	def on_moved(self, event):
 		for filename in os.listdir(trackingFolder):
 			detectingFolders()
 			default = os.path.join(trackingFolder, filename)
 			new = default
 			exists = False
 
-			for proc in psutil.process_iter():
-				try:
-					filesList = proc.open_files()
-					if filesList:
-						print(proc.pid,proc.name())
-						for nt in filesList:
-							print("\t",nt.path)
-				except psutil.NoSuchProcess:
-					pass
-				except psutil.AccessDenied:
-					pass
+			# for proc in psutil.process_iter():
+			# 	try:
+			# 		filesList = proc.open_files()
+			# 		if filesList:
+			# 			for nt in filesList:
+			# 				if "_Pic" in nt.path:
+			# 					print(proc.pid,proc.name())
+			# 					print("\t",nt.path)
+			# 	except psutil.NoSuchProcess:
+			# 		pass
+			# 	except psutil.AccessDenied:
+			# 		pass
+			# return
 
 			if any(_ in filename.split('.')[-1] for _ in extensionList["images"]):
 				position = 0
