@@ -2,6 +2,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from datetime import datetime
 from time import sleep
+from re import findall
 import os
 import sys
 
@@ -50,17 +51,45 @@ def processingFile(filename, destination):
 	формирование файла с новым названием, т.к файл с первоначальным названием уже существует
 	'''
 
-	filesList = [_ for _ in os.listdir(destination) if filename in _]
-
-	pickedFileName = '.'.join(filename.split('.')[:-1])
-	fileDigit = len(filesList)
+	fileDigit = 1
 	fileExtension = filename.split('.')[-1]
 
-	fileName = f"{pickedFileName}_{fileDigit}.{fileExtension}"
+	splited = findall(r"_.+", filename)
+	splited_file_name = findall(r".+_", filename)
+
+	if len(splited_file_name):
+		splited_file_name = splited_file_name[0][:-1]
+	else:
+		splited_file_name = '.'.join(filename.split('.')[:-1])
+
+	if len(splited):
+		splited = splited[0].split('.')
+
+		if len(splited) > 1:
+			splited = splited[0].split("_")[-1]
+
+			if splited.isdigit():
+				fileDigit = int(splited)
+
+		elif len(splited) == 1:
+
+			for i, letter in enumerate(splited[0]):
+				if letter == "_":
+					fileDigit = 0
+
+					while splited[0][i+1].isdigit():
+						fileDigit += 1
+						i += 1
+					break
+	else:
+		filesList = [_ for _ in os.listdir(destination) if ''.join(filename.split(".")[:-1]) in _]
+		fileDigit = len(filesList)
+
+	fileName = f"{splited_file_name}_{fileDigit}.{fileExtension}"
 
 	while fileName in os.listdir(destination):
 		fileDigit += 1
-		fileName = f"{pickedFileName}_{fileDigit}.{fileExtension}"
+		fileName = f"{splited_file_name}_{fileDigit}.{fileExtension}"
 
 	return os.path.join(destination, fileName)
 
@@ -82,7 +111,8 @@ if len(args):
 	disk = args[1]
 else:
 	trackingFolder = "D:\\Downloaded"
-	disk = "D:\\Python"
+	disk = "D:\\"
+
 folders = ["_Pictures", "_Documents", "_Audios", "_Videos"] # has to match with extensionList keys order
 
 extensionList = {
