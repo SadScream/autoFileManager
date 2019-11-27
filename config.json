@@ -1,0 +1,42 @@
+{
+    "extensionList": {
+        "images": [
+            "jpg",
+            "bmp",
+            "png",
+            "jpeg",
+            "gif"
+        ],
+        "documents": [
+            "doc",
+            "docx",
+            "pptx",
+            "pdf",
+            "xls",
+            "xlsx",
+            "xlsm"
+        ],
+        "audios": [
+            "ogg",
+            "mp3"
+        ],
+        "videos": [
+            "mp4"
+        ]
+    },
+    "trackingFolder": "C:/Users/DELL/Downloads",
+    "Aud": "D:/_Audios",
+    "Doc": "D:/_Documents",
+    "Img": "D:/_Pictures",
+    "Vid": "D:/_Videos",
+    "dTrackingFolder": "C:/Users/DELL/Downloads",
+    "dAud": "C:/Users/DELL/Music",
+    "dDoc": "C:/Users/DELL/Documents",
+    "dImg": "C:/Users/DELL/Pictures",
+    "dVid": "C:/Users/DELL/Videos",
+    "trackingDefState": 0,
+    "audDefState": 0,
+    "docDefState": 0,
+    "imgDefState": 2,
+    "vidDefState": 0
+}
