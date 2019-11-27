@@ -1,5 +1,5 @@
 __version__ = 0.2
-__developer__ = True
+__developer__ = False
 
 '''
 if __developer__ = true so the default folders fields will contain my personal paths like D:/_Pictures
@@ -279,7 +279,9 @@ class Window(QMainWindow, Ui_MainWindow):
 
 	def message(self, text):
 		self.show_message = QMessageBox(self)
-		self.show_message.setWindowIcon(self.icon)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/icons/icons/folder.png"), QIcon.Normal, QIcon.Off)
+		self.show_message.setWindowIcon(icon)
 		self.show_message.setIcon(QMessageBox.Information)
 		self.show_message.setText(text)
 		self.show_message.setWindowTitle("Информация")
@@ -292,6 +294,7 @@ class Window(QMainWindow, Ui_MainWindow):
 		self.groupBox.setEnabled(arg)
 		self.trackingFolder.setEnabled(arg)
 		self.trackingDef.setEnabled(arg)
+		self.getTrackingPath.setEnabled(arg)
 
 
 	def stopTargeting(self):
