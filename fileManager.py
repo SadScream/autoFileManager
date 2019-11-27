@@ -9,8 +9,6 @@ else it will contains smth like C:/Users/User/Documents
 import fix_qt_import_error
 
 from watchdog.observers import Observer
-from datetime import datetime
-from threading import Thread
 from getpass import getuser
 from time import sleep
 
@@ -279,8 +277,8 @@ class Window(QMainWindow, Ui_MainWindow):
 
 	def message(self, text):
 		self.show_message = QMessageBox(self)
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/icons/icons/folder.png"), QIcon.Normal, QIcon.Off)
+		icon = QIcon()
+		icon.addPixmap(QPixmap(":/icons/icons/folder.png"), QIcon.Normal, QIcon.Off)
 		self.show_message.setWindowIcon(icon)
 		self.show_message.setIcon(QMessageBox.Information)
 		self.show_message.setText(text)
