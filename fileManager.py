@@ -1,11 +1,18 @@
+__version__ = 0.2
+__developer__ = True
+
+'''
+if __developer__ = true so the default folders fields will contain my personal paths like D:/_Pictures
+else it will contains smth like C:/Users/User/Documents
+'''
+
 import fix_qt_import_error
+
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 from datetime import datetime
 from threading import Thread
 from getpass import getuser
 from time import sleep
-from re import findall
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -15,100 +22,15 @@ import os
 import sys
 
 import JsonHandler
+from EventHandler import Event
 from design import Ui_MainWindow
-
-
-class Event(FileSystemEventHandler):
-
-	def __init__(self, paths):
-		self.trackingFolder = paths["TrackingFolder"]
-		self.destinations = [v for k, v in paths.items()][1:]
-
-	def on_created(self, event):
-		sleep(4)
-		self.on_moved(event)
-
-	def on_moved(self, event):
-		extensionList = config.read("extensionList")
-
-		for filename in os.listdir(self.trackingFolder):
-			default = os.path.join(self.trackingFolder, filename)
-			new = default
-
-			if any(_ in filename.split('.')[-1] for _ in extensionList["images"]):
-				position = 2
-			elif any(_ in filename.split('.')[-1] for _ in extensionList["documents"]):
-				position = 1
-			elif any(_ in filename.split('.')[-1] for _ in extensionList["audios"]):
-				position = 0
-			elif any(_ in filename.split('.')[-1] for _ in extensionList["videos"]):
-				position = 3
-			else:
-				continue
-
-			if filename not in os.listdir(self.destinations[position]): # есть ли уже в папке файл с таким названием
-				new = os.path.join(self.destinations[position], filename)
-			else:
-				new = self.processingFile(filename, self.destinations[position])
-
-			if new != default:
-				os.rename(default, new)
-
-
-	def processingFile(self, filename, destination):
-		'''
-		формирование файла с новым названием, т.к файл с первоначальным названием уже существует
-		например: мы скачали изображение hello.jpg, но оно уже есть в конечной папке, значит в конечную папку этот файл перенесется с именем hello_1.jpg
-		все последующие файлы с таким названием будут записываться как hello_2.jpg, hello_3.jpg и так далее
-		'''
-
-		fileDigit = 1
-		fileExtension = filename.split('.')[-1]
-
-		splited = findall(r"_.+", filename)
-		splited_file_name = findall(r".+_", filename)
-
-		if len(splited_file_name):
-			splited_file_name = splited_file_name[0][:-1]
-		else:
-			splited_file_name = '.'.join(filename.split('.')[:-1])
-
-		if len(splited):
-			splited = splited[0].split('.')
-
-			if len(splited) > 1:
-				splited = splited[0].split("_")[-1]
-
-				if splited.isdigit():
-					fileDigit = int(splited)
-
-			elif len(splited) == 1:
-
-				for i, letter in enumerate(splited[0]):
-					if letter == "_":
-						fileDigit = 0
-
-						while splited[0][i+1].isdigit():
-							fileDigit += 1
-							i += 1
-						break
-		else:
-			filesList = [_ for _ in os.listdir(destination) if ''.join(filename.split(".")[:-1]) in _]
-			fileDigit = len(filesList)
-
-		fileName = f"{splited_file_name}_{fileDigit}.{fileExtension}"
-
-		while fileName in os.listdir(destination):
-			fileDigit += 1
-			fileName = f"{splited_file_name}_{fileDigit}.{fileExtension}"
-
-		return os.path.join(destination, fileName)
 
 
 class Window(QMainWindow, Ui_MainWindow):
 
 	def __init__(self):
 		self.init_observer()
+
 		super().__init__()
 		self.setupUi(self)
 		self.constructor()
@@ -130,12 +52,28 @@ class Window(QMainWindow, Ui_MainWindow):
 
 	def constructor(self):
 		self.setFocus()
+		self.versionLabel.setText(f"Version: {__version__}")
 
-		config.write("dTrackingFolder", f"C:\\Users\\{USER}\\Downloads")
-		config.write("dAud", f"C:\\Users\\{USER}\\Music")
-		config.write("dDoc", f"C:\\Users\\{USER}\\Documents")
-		config.write("dImg", f"C:\\Users\\{USER}\\Pictures")
-		config.write("dVid", f"C:\\Users\\{USER}\\Videos")
+		if __developer__ == False:
+			config.write("dTrackingFolder", f"C:/Users/{USER}/Downloads")
+			config.write("dAud", f"C:/Users/{USER}/Music")
+			config.write("dDoc", f"C:/Users/{USER}/Documents")
+			config.write("dImg", f"C:/Users/{USER}/Pictures")
+			config.write("dVid", f"C:/Users/{USER}/Videos")
+		else:
+			config.write("dTrackingFolder", f"D:/Downloaded")
+			config.write("dAud", f"D:/_Audios")
+			config.write("dDoc", f"D:/_Documents")
+			config.write("dImg", f"D:/_Pictures")
+			config.write("dVid", f"D:/_Videos")
+
+		# binding folder buttons
+		self.getTrackingPath.clicked.connect(self.openGetTrackingPath)
+		self.getAudPath.clicked.connect(self.openGetAudPath)
+		self.getDocPath.clicked.connect(self.openGetDocPath)
+		self.getImgPath.clicked.connect(self.openGetImgPath)
+		self.getVidPath.clicked.connect(self.openGetVidPath)
+		#
 
 		# binding check buttons and setting states from config
 		self.trackingDef.stateChanged.connect(self.trackingDefStateChanged)
@@ -163,6 +101,12 @@ class Window(QMainWindow, Ui_MainWindow):
 		self.Doc.textEdited.connect(self.docChanged)
 		self.Img.textEdited.connect(self.imgChanged)
 		self.Vid.textEdited.connect(self.vidChanged)
+
+		self.trackingFolder.textChanged.connect(self.trackingChanged)
+		self.Aud.textChanged.connect(self.audChanged)
+		self.Doc.textChanged.connect(self.docChanged)
+		self.Img.textChanged.connect(self.imgChanged)
+		self.Vid.textChanged.connect(self.vidChanged)
 		#
 
 		self.startBtn.clicked.connect(self.start)
@@ -181,15 +125,6 @@ class Window(QMainWindow, Ui_MainWindow):
 		event = Event(paths)
 		self.observer.schedule(event, paths["TrackingFolder"], recursive=True)
 		self.observer.start()
-
-
-	def message(self, text):
-		self.show_message = QMessageBox(self)
-		self.show_message.setWindowIcon(self.icon)
-		self.show_message.setIcon(QMessageBox.Information)
-		self.show_message.setText(text)
-		self.show_message.setWindowTitle("Информация")
-		self.show_message.exec_()
 
 
 	def check_fields(self):
@@ -211,12 +146,43 @@ class Window(QMainWindow, Ui_MainWindow):
 				items[i][1] = config.read(items[i][0])
 
 			if os.path.isabs(item[1]) and not os.path.exists(item[1]):
-				if item[1] not in ["C:\\", "D:\\", "E:\\", "F:\\", "G:\\", "H:\\"]:
+				if item[1] not in ["C:/", "D:/", "E:/", "F:/", "G:/", "H:/"]:
 					os.mkdir(item[1])
 
 			paths[item[0][1:]] = item[1]
 
 		return paths
+
+
+	def openGetTrackingPath(self):
+		directory = QFileDialog.getExistingDirectory(None, 'Выберите папку:', self.trackingFolder.text(), QFileDialog.ShowDirsOnly)
+
+		if len(directory):
+			self.trackingFolder.setText(directory)
+
+	def openGetAudPath(self):
+		directory = QFileDialog.getExistingDirectory(None, 'Выберите папку:', self.Aud.text(), QFileDialog.ShowDirsOnly)
+
+		if len(directory):
+			self.Aud.setText(directory)
+
+	def openGetDocPath(self):
+		directory = QFileDialog.getExistingDirectory(None, 'Выберите папку:', self.Doc.text(), QFileDialog.ShowDirsOnly)
+
+		if len(directory):
+			self.Doc.setText(directory)
+
+	def openGetImgPath(self):
+		directory = QFileDialog.getExistingDirectory(None, 'Выберите папку:', self.Img.text(), QFileDialog.ShowDirsOnly)
+
+		if len(directory):
+			self.Img.setText(directory)
+
+	def openGetVidPath(self):
+		directory = QFileDialog.getExistingDirectory(None, 'Выберите папку:', self.Vid.text(), QFileDialog.ShowDirsOnly)
+
+		if len(directory):
+			self.Vid.setText(directory)
 
 
 	def trackingChanged(self):
@@ -248,9 +214,11 @@ class Window(QMainWindow, Ui_MainWindow):
 		if state == 2:
 			self.trackingFolder.setText(config.read("dTrackingFolder"))
 			self.trackingFolder.setEnabled(False)
+			self.getTrackingPath.setEnabled(False)
 		else:
 			self.trackingFolder.setText(config.read("trackingFolder"))
 			self.trackingFolder.setEnabled(True)
+			self.getTrackingPath.setEnabled(True)			
 
 	def audStateChanged(self):
 		state = self.audDef.checkState()
@@ -260,9 +228,11 @@ class Window(QMainWindow, Ui_MainWindow):
 		if state == 2:
 			self.Aud.setText(config.read("dAud"))
 			self.Aud.setEnabled(False)
+			self.getAudPath.setEnabled(False)
 		else:
 			self.Aud.setText(config.read("Aud"))
 			self.Aud.setEnabled(True)
+			self.getAudPath.setEnabled(True)
 
 	def docStateChanged(self):
 		state = self.docDef.checkState()
@@ -272,9 +242,11 @@ class Window(QMainWindow, Ui_MainWindow):
 		if state == 2:
 			self.Doc.setText(config.read("dDoc"))
 			self.Doc.setEnabled(False)
+			self.getDocPath.setEnabled(False)
 		else:
 			self.Doc.setText(config.read("Doc"))
 			self.Doc.setEnabled(True)
+			self.getDocPath.setEnabled(True)
 
 	def imgStateChanged(self):
 		state = self.imgDef.checkState()
@@ -284,9 +256,11 @@ class Window(QMainWindow, Ui_MainWindow):
 		if state == 2:
 			self.Img.setText(config.read("dImg"))
 			self.Img.setEnabled(False)
+			self.getImgPath.setEnabled(False)
 		else:
 			self.Img.setText(config.read("Img"))
 			self.Img.setEnabled(True)
+			self.getImgPath.setEnabled(True)
 
 	def vidStateChanged(self):
 		state = self.vidDef.checkState()
@@ -296,9 +270,21 @@ class Window(QMainWindow, Ui_MainWindow):
 		if state == 2:
 			self.Vid.setText(config.read("dVid"))
 			self.Vid.setEnabled(False)
+			self.getVidPath.setEnabled(False)
 		else:
 			self.Vid.setText(config.read("Vid"))
 			self.Vid.setEnabled(True)
+			self.getVidPath.setEnabled(True)
+
+
+	def message(self, text):
+		self.show_message = QMessageBox(self)
+		self.show_message.setWindowIcon(self.icon)
+		self.show_message.setIcon(QMessageBox.Information)
+		self.show_message.setText(text)
+		self.show_message.setWindowTitle("Информация")
+		self.show_message.exec_()
+
 
 	def widgetsEnabled(self, arg):
 		self.startBtn.setEnabled(arg)
@@ -307,9 +293,11 @@ class Window(QMainWindow, Ui_MainWindow):
 		self.trackingFolder.setEnabled(arg)
 		self.trackingDef.setEnabled(arg)
 
+
 	def stopTargeting(self):
 		self.observer.stop()
 		self.observer.join()
+
 		if not self.observer.is_alive():
 			self.widgetsEnabled(True)
 

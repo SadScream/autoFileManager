@@ -7,10 +7,15 @@ from json import loads, dumps
 default = {
 	"extensionList": {
 		"images": ['jpg', 'bmp', 'png', 'jpeg', 'gif'],
-		"documents": ['doc', 'docx', 'pptx', 'pdf', 'xls', 'xlsx'],
+		"documents": ['doc', 'docx', 'pptx', 'pdf', 'xls', 'xlsx', 'xlsm'],
 		"audios": ['ogg', 'mp3'],
 		"videos": ['mp4']
 	},
+	"trackingFolder": "",
+	"Aud": "",
+	"Doc": "",
+	"Img": "",
+	"Vid": "",
 	"dTrackingFolder": "",
 	"dAud": "",
 	"dDoc": "",
@@ -20,12 +25,7 @@ default = {
 	"audDefState": 0,
 	"docDefState": 0,
 	"imgDefState": 0,
-	"vidDefState": 0,
-	"trackingFolder": "",
-	"Aud": "",
-	"Doc": "",
-	"Img": "",
-	"Vid": ""
+	"vidDefState": 0
 }
 
 
