@@ -1,3 +1,4 @@
+import fix_qt_import_error
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from datetime import datetime
@@ -115,7 +116,9 @@ class Window(QMainWindow, Ui_MainWindow):
 
 	def closeEvent(self, e): # событие нажатия крестик
 		self.observer.stop()
-		self.observer.join()
+		
+		if self.observer.is_alive():
+			self.observer.join()
 
 		while True:
 			if not self.observer.is_alive():

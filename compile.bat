@@ -1,1 +1,1 @@
-pyinstaller --onefile --icon=file.ico fileManager.py
+pyinstaller --onefile --noconsole --icon=file.ico fileManager.py
