@@ -120,7 +120,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "FileManager"))
         self.trackingLabel.setText(_translate("MainWindow", "Отслеживаемая папка:"))
         self.trackingDef.setText(_translate("MainWindow", "По умолчанию"))
         self.groupBox.setTitle(_translate("MainWindow", "Конечные папки"))
