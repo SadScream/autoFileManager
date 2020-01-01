@@ -3,7 +3,7 @@
 Приложение, написанное на языке Python3 и отслеживающее, по задумке, папку загрузок с целью перемещения оттуда файлов определенного формата в другие указанные папки. Например, вы скачиваете картинку и она сразу перемещается из папки загрузок в папку для картинок.
 
 ---
-Интерфейс создан при помощи фреймворка [PyQt5](https://pypi.org/project/PyQt5/) и инструмента [Designer](https://pypi.org/project/pyqt5-tools/); отслеживающий механизм работает на основе библиотеки [watchdog](https://pypi.org/project/watchdog/). [Упаковано в .exe](https://drive.google.com/open?id=11WFgvlrP23XUXNKAlTUH1XQvkeJd07Cu) при помощи библиотеки [PyInstaller](https://pypi.org/project/PyInstaller/)
+Интерфейс создан при помощи фреймворка [PyQt5](https://pypi.org/project/PyQt5/) и инструмента [Designer](https://pypi.org/project/pyqt5-tools/); отслеживающий механизм работает на основе библиотеки [watchdog](https://pypi.org/project/watchdog/). [Упаковано в .exe](https://drive.google.com/open?id=1YBA14oaTooqtIZ9Fu1ooCZEauer1a5-K) при помощи библиотеки [PyInstaller](https://pypi.org/project/PyInstaller/)
 
 ---
 ### Использование
