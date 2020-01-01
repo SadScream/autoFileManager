@@ -5,11 +5,17 @@ from json import loads, dumps
 
 
 default = {
+	"version": 0.3,
 	"extensionList": {
-		"images": ['jpg', 'bmp', 'png', 'jpeg', 'gif'],
-		"documents": ['doc', 'docx', 'pptx', 'pdf', 'xls', 'xlsx', 'xlsm'],
-		"audios": ['ogg', 'mp3'],
-		"videos": ['mp4']
+		"images": ['jpg', 'jpeg', 'bmp', 'dib', 'png', 'gif', 'tiff', 'tif'],
+		"documents": [
+			'doc', 'docx', 'docm', 'dotx', 'dotm',
+			'xls', 'xlsx', 'xlsm', 'xltx', 'xltm', 'xlsb', 'xlam', 
+			'pptx', 'ppt', 'pptm', 'ppsm', 'potx',
+			'txt', 'pdf'
+			],
+		"audios": ['ogg', 'mp3', 'm4r', 'aac', 'aiff', 'wav', 'wma'],
+		"videos": ['mp4', 'mpeg', 'avi']
 	},
 	"trackingFolder": "",
 	"Aud": "",

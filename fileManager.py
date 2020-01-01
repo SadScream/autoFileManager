@@ -1,11 +1,3 @@
-__version__ = 0.2
-__developer__ = False
-
-'''
-if __developer__ = true so the default folders fields will contain my personal paths like D:/_Pictures
-else it will contains smth like C:/Users/User/Documents
-'''
-
 import fix_qt_import_error
 
 from watchdog.observers import Observer
@@ -34,8 +26,10 @@ class Window(QMainWindow, Ui_MainWindow):
 		self.constructor()
 		self.show()
 
+
 	def closeEvent(self, e): # событие нажатия крестик
 		self.observer.stop()
+		self.tray_icon.hide()
 		
 		if self.observer.is_alive():
 			self.observer.join()
@@ -43,6 +37,15 @@ class Window(QMainWindow, Ui_MainWindow):
 		while True:
 			if not self.observer.is_alive():
 				sys.exit(0)
+
+
+	def showEvent(self, e):
+		self.showNormal()
+
+
+	def hideEvent(self, e):
+		self.hide()
+
 
 	def init_observer(self):
 		self.observer = Observer()
@@ -52,18 +55,11 @@ class Window(QMainWindow, Ui_MainWindow):
 		self.setFocus()
 		self.versionLabel.setText(f"Version: {__version__}")
 
-		if __developer__ == False:
-			config.write("dTrackingFolder", f"C:/Users/{USER}/Downloads")
-			config.write("dAud", f"C:/Users/{USER}/Music")
-			config.write("dDoc", f"C:/Users/{USER}/Documents")
-			config.write("dImg", f"C:/Users/{USER}/Pictures")
-			config.write("dVid", f"C:/Users/{USER}/Videos")
-		else:
-			config.write("dTrackingFolder", f"D:/Downloaded")
-			config.write("dAud", f"D:/_Audios")
-			config.write("dDoc", f"D:/_Documents")
-			config.write("dImg", f"D:/_Pictures")
-			config.write("dVid", f"D:/_Videos")
+		config.write("dTrackingFolder", f"C:/Users/{USER}/Downloads")
+		config.write("dAud", f"C:/Users/{USER}/Music")
+		config.write("dDoc", f"C:/Users/{USER}/Documents")
+		config.write("dImg", f"C:/Users/{USER}/Pictures")
+		config.write("dVid", f"C:/Users/{USER}/Videos")
 
 		# binding folder buttons
 		self.getTrackingPath.clicked.connect(self.openGetTrackingPath)
@@ -109,6 +105,28 @@ class Window(QMainWindow, Ui_MainWindow):
 
 		self.startBtn.clicked.connect(self.start)
 		self.stopBtn.clicked.connect(self.stopTargeting)
+
+		icon = QIcon()
+		icon.addPixmap(QPixmap(":/icons/icons/folder.png"), QIcon.Normal, QIcon.Off)
+
+		self.tray_icon = QSystemTrayIcon(self)
+		self.tray_icon.setIcon(QIcon(icon))
+
+		show_action = QAction("Show", self)
+		hide_action = QAction("Hide", self)
+		quit_action = QAction("Exit", self)
+
+		show_action.triggered.connect(self.show)
+		hide_action.triggered.connect(self.hide)
+		quit_action.triggered.connect(self.closeEvent)
+
+		tray_menu = QMenu()
+		tray_menu.addAction(show_action)
+		tray_menu.addAction(hide_action)
+		tray_menu.addAction(quit_action)
+
+		self.tray_icon.setContextMenu(tray_menu)
+		self.tray_icon.show()
 
 
 	def start(self):
@@ -216,7 +234,7 @@ class Window(QMainWindow, Ui_MainWindow):
 		else:
 			self.trackingFolder.setText(config.read("trackingFolder"))
 			self.trackingFolder.setEnabled(True)
-			self.getTrackingPath.setEnabled(True)			
+			self.getTrackingPath.setEnabled(True)           
 
 	def audStateChanged(self):
 		state = self.audDef.checkState()
@@ -306,6 +324,7 @@ class Window(QMainWindow, Ui_MainWindow):
 if __name__=="__main__":
 	USER = getuser()
 	config = JsonHandler.JsonHandler()
+	__version__ = config.read("version")
 	app = QApplication(sys.argv)
 	window = Window()
 	sys.exit(app.exec_())
